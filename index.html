@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- <link rel="stylesheet" href="css/style.css"> -->
+</head>
+
+<body>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+    <style>
+        html {
+            font-size: 1.5vw;
+        }
+
+        body {
+            /* display: inline-block; */
+            white-space: nowrap;
+            font-family: 'Kosugi Maru', sans-serif;
+            /* font-weight: bold; */
+        }
+
+
+        #countdown-timer {
+            padding: 1rem 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: blue;
+            color: white;
+            /* line-height: 1; */
+            font-size: 2rem;
+        }
+
+        .ato {
+            margin: 0 1rem;
+        }
+
+        .countdown-section {
+            display: flex;
+            /* flex-direction: column; */
+            align-items: center;
+        }
+
+        .countdown-amount {
+            font-weight: bold;
+        }
+
+        .countdown-section {
+            font-size: 3rem;
+        }
+
+        .remain-time {
+            /* font-size: 3rem; */
+        }
+    </style>
+
+    <div id="countdown-timer">
+        <div class="text">３日間限定特別価格終了まで<span class="ato">あと</span></div>
+
+        <div class="countdown-section">
+            <span class="countdown-amount" id="days"></span>
+            <span class="countdown-period">日</span>
+        </div>
+
+        <div class="countdown-section">
+            <span class="countdown-amount" id="hours"></span>
+            <span class="countdown-period">時間</span>
+        </div>
+
+        <div class="countdown-section">
+            <span class="countdown-amount" id="minutes"></span>
+            <span class="countdown-period">分</span>
+        </div>
+
+        <div class="countdown-section">
+            <span class="countdown-amount" id="seconds"></span>
+            <span class="countdown-period">秒</span>
+            <span>!!</span>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function updateTimerDisplay(days, hours, minutes, seconds) {
+            document.getElementById("days").textContent = String(days).padStart(2, "0");
+            document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+            document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+            document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
+        }
+
+        function countdown(remainingTime) {
+            const remainingDays = Math.floor(remainingTime / (24 * 60 * 60));
+            const remainingHours = Math.floor((remainingTime % (24 * 60 * 60)) / (60 * 60));
+            const remainingMinutes = Math.floor((remainingTime % (60 * 60)) / 60);
+            const remainingSeconds = remainingTime % 60;
+
+            updateTimerDisplay(remainingDays, remainingHours, remainingMinutes, remainingSeconds);
+
+            if (remainingTime <= 0) {
+                alert("時間切れです！");
+                localStorage.removeItem("remainingTime");
+                localStorage.removeItem("visitTimestamp");
+            } else {
+                remainingTime--;
+                localStorage.setItem("remainingTime", remainingTime);
+                setTimeout(() => countdown(remainingTime), 1000);
+            }
+        }
+
+        window.onload = function () {
+            let remainingTime = localStorage.getItem("remainingTime");
+            let visitTimestamp = localStorage.getItem("visitTimestamp");
+
+            if (remainingTime === null) {
+                remainingTime = 3 * 24 * 60 * 60; // 3日（259200秒）
+                localStorage.setItem("remainingTime", remainingTime);
+            } else {
+                remainingTime = parseInt(remainingTime, 10);
+            }
+
+            if (visitTimestamp === null) {
+                visitTimestamp = Date.now();
+                localStorage.setItem("visitTimestamp", visitTimestamp);
+            } else {
+                visitTimestamp = parseInt(visitTimestamp, 10);
+                const timeElapsed = Math.floor((Date.now() - visitTimestamp) / 1000);
+                remainingTime -= timeElapsed;
+                localStorage.setItem("remainingTime", remainingTime);
+                localStorage.setItem("visitTimestamp", Date.now());
+            }
+
+            countdown(remainingTime);
+        };
+
+
+    </script>
+</body>
+
+</html>
